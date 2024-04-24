@@ -1,4 +1,6 @@
-export default interface casasInterface {
+import { Document } from 'mongoose';
+
+export default interface casasInterface extends Document {
     nameModel: string;
     price: number;
     rooms: number;
