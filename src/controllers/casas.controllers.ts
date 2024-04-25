@@ -21,12 +21,14 @@ export const createCasa = async (req: Request, res: Response) => {
 
 export const getCasaByName = async (req: Request, res: Response) => {
     try {
-        const { nameModel } = req.query;
-
-        const findCasa = await Casas.findOne({ nameModel });
+        const { name } = req.query;
+        if(!name || typeof name !== 'string' || name.trim() === '') {
+            return getAllCasas(req, res);
+        };
+        const findCasa = await Casas.find({ nameModel: { $regex: new RegExp(name, 'i') } });
 
         if (!findCasa) {
-            return res.status(404).json({ message: `No se encontró ninguna casa con el nombre '${nameModel}'`})
+            return res.status(404).json({ message: `No se encontró ninguna casa con el nombre '${name}'`})
         } else {
             return res.status(200).json(findCasa)
         }
