@@ -34,3 +34,30 @@ export const getCasaByName = async (req: Request, res: Response) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
+export const getAllCasas = async (req: Request, res: Response) => {
+    try {
+        const dataCasas = await Casas.find();
+
+        if (!dataCasas || dataCasas.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron casas en la base de datos' })
+        } else {
+            const formatteData = {
+                message: 'Lista de casas',
+                data: dataCasas.map((casa) => ({
+                    nameModel: casa.nameModel,
+                    price: casa.price,
+                    rooms: casa.rooms,
+                    bathroom: casa.bathroom,
+                    dimensions: casa.dimensions,
+                    blueprints: casa.blueprints,
+                    inside: casa.inside,
+                    offside: casa.offside
+                }))
+            }
+            return formatteData;
+        }
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
