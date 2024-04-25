@@ -18,18 +18,11 @@ export const createPromo = async (req: Request, res: Response) => {
     }
 };
 
-export const getPromo = async (req: Request, res: Response) => {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
+export const getPromo = async (_req: Request, res: Response) => {
     try {
-        const options = {
-            page,
-            limit
-        };
-        
-        const allPromos = await Promos.paginate({}, options);
+        const allPromos = await Promos.find();
 
-        allPromos.docs.reverse();
+        allPromos.reverse();
         return res.status(200).json(allPromos);
     } catch (error) {
         return res.status(500).json({ message: error.message });
