@@ -2,6 +2,7 @@ import { Document } from 'mongoose';
 
 export default interface casasInterface extends Document {
     nameModel: string;
+    description: string;
     price: number;
     rooms: number;
     bathroom: number;

@@ -1,4 +1,5 @@
 import casasInterface from '../types/casas.type';
+import optionsInterface from '../types/options.types';
 import Casas from '../models/casas.models';
 import { Request, Response } from 'express';
 
@@ -20,15 +21,21 @@ export const createCasa = async (req: Request, res: Response) => {
 };
 
 export const getCasaByName = async (req: Request, res: Response) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 5;
     try {
         const { name } = req.query;
-        if(!name || typeof name !== 'string' || name.trim() === '') {
-            return getAllCasas(req, res);
+        const option: optionsInterface = {
+            page,
+            limit
         };
-        const findCasa = await Casas.find({ nameModel: { $regex: new RegExp(name, 'i') } });
+        if (!name || typeof name !== 'string' || name.trim() === '') {
+            return getAllCasas(req, res, option);
+        };
+        const findCasa = await Casas.paginate({ nameModel: { $regex: new RegExp(name, 'i') } }, option);
 
         if (!findCasa) {
-            return res.status(404).json({ message: `No se encontró ninguna casa con el nombre '${name}'`})
+            return res.status(404).json({ message: `No se encontró ninguna casa con el nombre '${name}'` })
         } else {
             return res.status(200).json(findCasa)
         }
@@ -37,15 +44,8 @@ export const getCasaByName = async (req: Request, res: Response) => {
     }
 };
 
-export const getAllCasas = async (req: Request, res: Response) => {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 5;
+export const getAllCasas = async (_req: Request, res: Response, option: optionsInterface) => {
     try {
-        const option = {
-            page,
-            limit
-        };
-
         const allCasas = await Casas.paginate({}, option)
 
         return res.status(200).json(allCasas);
@@ -55,5 +55,5 @@ export const getAllCasas = async (req: Request, res: Response) => {
 };
 
 export const deleteCasa = async () => {
-    
+
 };

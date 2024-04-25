@@ -4,6 +4,7 @@ import paginate from 'mongoose-paginate-v2';
 
 const casasSchema = new Schema<casasInterface>({
     nameModel: { type: String, required: true },
+    description: { type: String, required: true },
     price: { type: Number, required: true },
     rooms: { type: Number, required: true },
     bathroom: { type:Number, default: 1 },
