@@ -1,5 +1,6 @@
 import express from 'express';
 import { Request, Response, NextFunction } from 'express';
+import routes from './routes/index.routes'
 
 const server = express();
 
@@ -18,6 +19,8 @@ server.use((_req:Request, res:Response, next) => {
     );
     next();
 });
+
+server.use("/", routes);
 
 server.use((err, _req:Request, res:Response, _next:NextFunction) => {
     console.error(err.stack);
