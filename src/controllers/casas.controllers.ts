@@ -1,4 +1,5 @@
 import casasInterface from '../types/casas.type';
+import optionsInterface from '../types/options.types';
 import Casas from '../models/casas.models';
 import { Request, Response } from 'express';
 
@@ -20,17 +21,21 @@ export const createCasa = async (req: Request, res: Response) => {
 };
 
 export const getCasaByName = async (req: Request, res: Response) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 5;
     try {
         const { name } = req.query;
-
-        if(!name || typeof name !== 'string' || name.trim() === '') {  // Si no mandan ningún parametro...
-            return getAllCasas(req, res);  // Que muestre todas las casas.
+        const option: optionsInterface = {
+            page,
+            limit
         };
-
-        const findCasa = await Casas.find({ nameModel: { $regex: new RegExp(name, 'i') } });
+        if (!name || typeof name !== 'string' || name.trim() === '') {
+            return getAllCasas(req, res, option);
+        };
+        const findCasa = await Casas.paginate({ nameModel: { $regex: new RegExp(name, 'i') } }, option);
 
         if (!findCasa) {
-            return res.status(404).json({ message: `No se encontró ninguna casa con el nombre '${name}'`})
+            return res.status(404).json({ message: `No se encontró ninguna casa con el nombre '${name}'` })
         } else {
             return res.status(200).json(findCasa)
         }
@@ -39,17 +44,25 @@ export const getCasaByName = async (req: Request, res: Response) => {
     }
 };
 
-export const getAllCasas = async (req: Request, res: Response) => {
-    const page = parseInt(req.query.page as string) || 1;  // En esta constante establecemos que muestre la pagina 1.
-    const limit = parseInt(req.query.limit as string) || 5;  // En esta constante establecemos el limite de casas que muestra por pagina.
+export const getAllCasas = async (_req: Request, res: Response, option: optionsInterface) => {
     try {
-        const option = {
-            page,
-            limit
-        };
-
         const allCasas = await Casas.paginate({}, option)
         return res.status(200).json(allCasas);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const getCasaById = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const findCasa = await Casas.findById(id);
+
+        if (!findCasa) {
+            return res.status(404).json({ message: `No se encontro la casa con ID: ${id}` });
+        };
+
+        return res.status(200).json(findCasa);
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -62,7 +75,7 @@ export const deleteCasa = async (req: Request, res: Response) => {
         const findCasa = await Casas.findById(id);
 
         if (!findCasa) {
-            return res.status(404).json({ message: `No se encontro la casa con ID: ${id} para eliminar`})
+            return res.status(404).json({ message: `No se encontro la casa con ID: ${id} para eliminar` })
         }
 
         await Casas.findByIdAndDelete(id);
@@ -72,7 +85,7 @@ export const deleteCasa = async (req: Request, res: Response) => {
     }
 };
 
-export const upGradeCasa = async (req: Request, res: Response) => {
+export const updateCasa = async (req: Request, res: Response) => {
     try {
         const upGradeData = req.body;  // En esta constante me guardo los datos para actualizar una casa.
         const { id } = req.params;
@@ -80,7 +93,7 @@ export const upGradeCasa = async (req: Request, res: Response) => {
         const findCasa = await Casas.findById(id);
 
         if (!findCasa) {
-            return res.status(404).json({ message: `No se encontro la casa con ID: ${id} para actualizar`})
+            return res.status(404).json({ message: `No se encontro la casa con ID: ${id} para actualizar` })
         }
 
         await Casas.findByIdAndUpdate(id, upGradeData, { new: true });
