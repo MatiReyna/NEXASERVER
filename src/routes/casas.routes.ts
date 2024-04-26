@@ -1,9 +1,13 @@
 import { Router } from 'express';
-import { createCasa, getCasaByName } from '../controllers/casas.controllers';
+import { createCasa, getCasaByName, getCasaById, deleteCasa, updateCasa } from '../controllers/casas.controllers';
 
 const router = Router();
 
+router.get('/', getCasaByName);
+router.get('/:id', getCasaById);
+
 router.post('/', createCasa);
-router.get('/', getCasaByName);  //Probando.
+router.put('/:id', updateCasa);
+router.delete('/:id', deleteCasa);
 
 export default router;

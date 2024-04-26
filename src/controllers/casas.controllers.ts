@@ -53,6 +53,21 @@ export const getAllCasas = async (_req: Request, res: Response, option: optionsI
     }
 };
 
+export const getCasaById = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const findCasa = await Casas.findById(id);
+
+        if (!findCasa) {
+            return res.status(404).json({ message: `No se encontro la casa con ID: ${id}` });
+        };
+
+        return res.status(200).json(findCasa);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 export const deleteCasa = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -60,7 +75,7 @@ export const deleteCasa = async (req: Request, res: Response) => {
         const findCasa = await Casas.findById(id);
 
         if (!findCasa) {
-            return res.status(404).json({ message: `No se encontro la casa con ID: ${id} para eliminar`})
+            return res.status(404).json({ message: `No se encontro la casa con ID: ${id} para eliminar` })
         }
 
         await Casas.findByIdAndDelete(id);
@@ -70,7 +85,7 @@ export const deleteCasa = async (req: Request, res: Response) => {
     }
 };
 
-export const upGradeCasa = async (req: Request, res: Response) => {
+export const updateCasa = async (req: Request, res: Response) => {
     try {
         const upGradeData = req.body;  // En esta constante me guardo los datos para actualizar una casa.
         const { id } = req.params;
@@ -78,7 +93,7 @@ export const upGradeCasa = async (req: Request, res: Response) => {
         const findCasa = await Casas.findById(id);
 
         if (!findCasa) {
-            return res.status(404).json({ message: `No se encontro la casa con ID: ${id} para actualizar`})
+            return res.status(404).json({ message: `No se encontro la casa con ID: ${id} para actualizar` })
         }
 
         await Casas.findByIdAndUpdate(id, upGradeData, { new: true });
