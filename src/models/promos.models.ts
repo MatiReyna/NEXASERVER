@@ -5,7 +5,8 @@ import paginate from 'mongoose-paginate-v2';
 
 const promosSchema = new Schema<promosInterface>({
     name: { type: String, required: true },
-    url: { type: String, required: true }
+    url: { type: String, required: true },
+    createdAt:{type: Date, default: Date.now} 
 }, { versionKey: false });
 
 promosSchema.plugin(paginate);

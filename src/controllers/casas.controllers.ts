@@ -15,7 +15,7 @@ export const createCasa = async (req: Request, res: Response) => {
 
         const newCasa = await new Casas(casa).save();
         return res.status(201).json(newCasa);
-    } catch (error) {
+    } catch (error: any) {
         return res.status(500).json({ message: error.message });
     }
 };
@@ -39,7 +39,7 @@ export const getCasaByName = async (req: Request, res: Response) => {
         } else {
             return res.status(200).json(findCasa)
         }
-    } catch (error) {
+    } catch (error: any) {
         return res.status(500).json({ message: error.message });
     }
 };
@@ -48,7 +48,7 @@ export const getAllCasas = async (_req: Request, res: Response, option: optionsI
     try {
         const allCasas = await Casas.paginate({}, option)
         return res.status(200).json(allCasas);
-    } catch (error) {
+    } catch (error: any) {
         return res.status(500).json({ message: error.message });
     }
 };
@@ -63,7 +63,7 @@ export const getCasaById = async (req: Request, res: Response) => {
         };
 
         return res.status(200).json(findCasa);
-    } catch (error) {
+    } catch (error: any) {
         return res.status(500).json({ message: error.message });
     }
 };
@@ -80,7 +80,7 @@ export const deleteCasa = async (req: Request, res: Response) => {
 
         await Casas.findByIdAndDelete(id);
         return res.status(200).json({ message: `La casa '${findCasa.nameModel}' fue eliminada con exito` });
-    } catch (error) {
+    } catch (error: any) {
         return res.status(500).json({ message: error.message });
     }
 };
@@ -98,7 +98,7 @@ export const updateCasa = async (req: Request, res: Response) => {
 
         await Casas.findByIdAndUpdate(id, upGradeData, { new: true });
         return res.status(200).json({ message: `La casa ${findCasa.nameModel} fue actualizada con exito` });
-    } catch (error) {
+    } catch (error: any) {
         return res.status(500).json({ message: error.message });
     }
 };
