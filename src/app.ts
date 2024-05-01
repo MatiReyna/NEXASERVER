@@ -22,9 +22,9 @@ server.use((_req:Request, res:Response, next) => {
 
 server.use("/", routes);
 
-server.use((err, _req:Request, res:Response, _next:NextFunction) => {
+server.use((err: Error, _req:Request, res:Response, _next:NextFunction) => {
     console.error(err.stack);
-    res.status(500).send('Algo salió mal!');
+    return res.status(500).send('Algo salió mal!');
 });
 
 export default server;
