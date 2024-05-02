@@ -29,12 +29,12 @@ export const logIn = async (req: Request, res: Response) => {
 
         const admin = await User.findOne({ email });
         if(!admin){
-            return res.status(404).json({validate: false, message:'Email incrrecto' });
+            return res.status(200).json({validate: false, email:'Email incrrecto' });
         };
 
         const validatePassword = await bcrypt.compare(password, admin.password );
         if(!validatePassword){
-            return res.status(404).json({validate: false, message:'Contraseña incrrecta' });
+            return res.status(200).json({validate: false, password:'Contraseña incorrecta' });
         };
 
         return res.status(200).json({validate: true, message:'Bienvenido' });
