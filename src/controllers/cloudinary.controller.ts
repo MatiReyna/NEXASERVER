@@ -1,6 +1,6 @@
 import { v2 } from 'cloudinary';
 import { Request, Response } from 'express';
-import { getPublicIdFromUrl, deleteServerImg } from '../helpers/imageAuxFunc';
+import { deleteCloud, deleteServerImg } from '../helpers/imageAuxFunc';
 
 import dotenv from 'dotenv';
 import * as path from 'path';
@@ -38,9 +38,7 @@ export const deleteImage = async (req: Request, res: Response) => {
     const { imageUrl } = req.body;
     try {
 
-      const publicId = getPublicIdFromUrl(imageUrl);
-  
-      await uploader.destroy(publicId);
+      await deleteCloud(imageUrl);
   
       res.status(200).json({ message: 'Imagen eliminada exitosamente de Cloudinary' });
     } catch (error) {

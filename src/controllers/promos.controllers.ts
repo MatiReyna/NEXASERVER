@@ -1,6 +1,9 @@
 import promosInterface from "../types/promos.type";
 import Promos from "../models/promos.models";
+
 import { Request, Response } from "express";
+import { deleteCloud } from '../helpers/imageAuxFunc';
+
 
 export const createPromo = async (req: Request, res: Response) => {
     try {
@@ -27,9 +30,9 @@ export const getPromo = async (_req: Request, res: Response) => {
     try {
         const allPromos = await Promos.find();
         const promoCount = await Promos.countDocuments();
-        
+
         allPromos.reverse();
-        return res.status(200).json({totalPromos: promoCount , allPromos});
+        return res.status(200).json({ totalPromos: promoCount, allPromos });
     } catch (error: any) {
         return res.status(500).json({ message: error.message });
     }
@@ -40,9 +43,11 @@ export const deletePromo = async (req: Request, res: Response) => {
         const { id } = req.params;
 
         const findedPromo = await Promos.findById(id)
-        if(!findedPromo){
+        if (!findedPromo) {
             return res.status(404).json(`No existe la promocion con id:${id}`);
-        }
+        };
+
+        await deleteCloud(findedPromo.url);
 
         await Promos.findByIdAndDelete(id);
 
