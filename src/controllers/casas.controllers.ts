@@ -1,6 +1,8 @@
 import casasInterface from '../types/casas.type';
 import optionsInterface from '../types/options.types';
 import Casas from '../models/casas.models';
+
+import { deleteCloud } from '../helpers/imageAuxFunc';
 import { Request, Response } from 'express';
 
 export const createCasa = async (req: Request, res: Response) => {
@@ -76,7 +78,13 @@ export const deleteCasa = async (req: Request, res: Response) => {
 
         if (!findCasa) {
             return res.status(404).json({ message: `No se encontro la casa con ID: ${id} para eliminar` })
-        }
+        };
+
+        const allImages = [...findCasa.blueprints, ...findCasa.inside, ... findCasa.offside];
+
+        allImages.forEach(async (image) => {
+            await deleteCloud(image)
+        });
 
         await Casas.findByIdAndDelete(id);
         return res.status(200).json({ message: `La casa '${findCasa.nameModel}' fue eliminada con exito` });

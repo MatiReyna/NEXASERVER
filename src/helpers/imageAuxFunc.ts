@@ -1,7 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { v2 } from 'cloudinary';
 
-export function getPublicIdFromUrl(imageUrl: string) {
+function getPublicIdFromUrl(imageUrl: string) {
 
     const startIndex = imageUrl.lastIndexOf('/') + 1; 
     const endIndex = imageUrl.lastIndexOf('.'); 
@@ -24,4 +25,11 @@ export function deleteServerImg(directory: string) {
         });
     }
     else { return "La Carpeta es incorrecta" };
+};
+
+export async function deleteCloud(url: string){
+    
+    const publicId = getPublicIdFromUrl(url);
+
+    await v2.uploader.destroy(publicId);
 }

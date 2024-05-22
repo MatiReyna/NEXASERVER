@@ -2,8 +2,7 @@ import promosInterface from "../types/promos.type";
 import Promos from "../models/promos.models";
 
 import { Request, Response } from "express";
-import { v2 } from 'cloudinary';
-import { getPublicIdFromUrl } from '../helpers/imageAuxFunc';
+import { deleteCloud } from '../helpers/imageAuxFunc';
 
 
 export const createPromo = async (req: Request, res: Response) => {
@@ -48,9 +47,7 @@ export const deletePromo = async (req: Request, res: Response) => {
             return res.status(404).json(`No existe la promocion con id:${id}`);
         };
 
-        const publicId = getPublicIdFromUrl(findedPromo.url);
-
-        await v2.uploader.destroy(publicId);
+        await deleteCloud(findedPromo.url);
 
         await Promos.findByIdAndDelete(id);
 
