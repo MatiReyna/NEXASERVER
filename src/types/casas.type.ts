@@ -1,13 +1,12 @@
-import { Document } from 'mongoose';
-
-export default interface casasInterface extends Document {
+export interface CasaAttributes {
+    id?: string;
     nameModel: string;
     description: string;
     price: number;
     rooms: number;
-    bathroom: number;
+    bathrooms: number;
     dimensions: number;
-    blueprints: string[];
+    blueprint: string[];
     inside: string[];
-    offside: string[];
+    outside: string[];
 };
