@@ -1,18 +1,23 @@
-import { Model, Schema, model } from 'mongoose';
-import userInterface from '../types/user.type';
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../db';
 
-const userSchema = new Schema<userInterface>({
-    email:{
-        type: String,
-        required: true,
-        unique: true
-    },
-    password:{
-        type: String,
-        required: true
-    }
-},{ versionKey: false });
-
-const User: Model<userInterface> = model<userInterface>('User', userSchema);
-
-export default User;
+export const User = sequelize.define('User',
+    {
+        id: {
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
+            primaryKey: true
+        },
+        email: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true,
+            validate: {
+                isEmail: true
+            }
+        },
+        password: {
+            type: DataTypes.STRING,
+            allowNull: false
+        }
+    }, { tableName: 'users', timestamps: false });

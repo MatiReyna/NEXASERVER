@@ -1,20 +1,47 @@
-import casasInterface from '../types/casas.type';
-import { PaginateModel, Schema, model } from 'mongoose';
-import paginate from 'mongoose-paginate-v2';
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../db';
 
-const casasSchema = new Schema<casasInterface>({
-    nameModel: { type: String, required: true },
-    description: { type: String, required: true },
-    price: { type: Number, required: true },
-    rooms: { type: Number, required: true },
-    bathroom: { type:Number, default: 1 },
-    dimensions: { type: Number, required: true },
-    blueprints: [{ type: String, required: true }],
-    inside: [{ type: String, required: true }],
-    offside: [{ type: String, required: true }]
-}, { versionKey: false });
-
-casasSchema.plugin(paginate);
-
-const Casas: PaginateModel<casasInterface> = model<casasInterface, PaginateModel<casasInterface>>('casas', casasSchema);
-export default Casas;
+export const Casa = sequelize.define('Casa',
+    {
+        id: {
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
+            primaryKey: true
+        },
+        nameModel: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        description: {
+            type: DataTypes.TEXT,
+            allowNull: false
+        },
+        price: {
+            type: DataTypes.DECIMAL,
+            allowNull: false
+        },
+        rooms: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        bathrooms: {
+            type: DataTypes.INTEGER,
+            defaultValue: 1
+        },
+        dimensions: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        blueprints: {
+            type: DataTypes.ARRAY(DataTypes.STRING),
+            allowNull: false
+        },
+        inside: {
+            type: DataTypes.ARRAY(DataTypes.STRING),
+            allowNull: false
+        },
+        offside: {
+            type: DataTypes.ARRAY(DataTypes.STRING),
+            allowNull: false
+        }
+    }, { tableName: 'casas', timestamps: false });
