@@ -1,21 +1,19 @@
-import casasInterface from '../types/casas.type';
-import optionsInterface from '../types/options.types';
-import Casas from '../models/casas.models';
-
-import { deleteCloud } from '../helpers/imageAuxFunc';
 import { Request, Response } from 'express';
+import { Op } from 'sequelize';
+import { Casa } from '../models/casas.models';
+import { deleteCloud } from '../helpers/imageAuxFunc';
 
 export const createCasa = async (req: Request, res: Response) => {
     try {
-        const casa: casasInterface = req.body;
+        const { nameModel } = req.body;
 
-        const findCasa = await Casas.findOne({ nameModel: casa.nameModel });
+        const findCasa = await Casa.findOne({ where: { nameModel } });
 
         if (findCasa) {
-            return res.status(404).json({ message: `La casa ${casa.nameModel} ya existe en la base de datos` })
+            return res.status(404).json({ message: `La casa ${nameModel} ya existe en la base de datos` })
         }
 
-        const newCasa = await new Casas(casa).save();
+        const newCasa = await Casa.create(req.body);
         return res.status(201).json(newCasa);
     } catch (error: any) {
         return res.status(500).json({ message: error.message });
@@ -23,32 +21,33 @@ export const createCasa = async (req: Request, res: Response) => {
 };
 
 export const getCasaByName = async (req: Request, res: Response) => {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 5;
     try {
         const { name } = req.query;
-        const option: optionsInterface = {
-            page,
-            limit
-        };
-        if (!name || typeof name !== 'string' || name.trim() === '') {
-            return getAllCasas(req, res, option);
-        };
-        const findCasa = await Casas.paginate({ nameModel: { $regex: new RegExp(name, 'i') } }, option);
 
-        if (!findCasa) {
-            return res.status(404).json({ message: `No se encontró ninguna casa con el nombre '${name}'` })
-        } else {
-            return res.status(200).json(findCasa)
+        if (!name || typeof name !== 'string' || name.trim() === '') {
+            return getAllCasas(req, res);
         }
+
+        const casas = await Casa.findAll({
+            where: {
+                nameModel: {
+                    [Op.iLike]: `%${name}%`
+                }
+            }
+        });
+
+        if (!casas.length) {
+            return res.status(404).json({ message: `No se encontró ninguna casa con el nombre '${name}'` })
+        }
+        return res.status(200).json(casas);
     } catch (error: any) {
         return res.status(500).json({ message: error.message });
     }
 };
 
-export const getAllCasas = async (_req: Request, res: Response, option: optionsInterface) => {
+export const getAllCasas = async (req: Request, res: Response) => {
     try {
-        const allCasas = await Casas.paginate({}, option)
+        const allCasas = await Casa.findAll();
         return res.status(200).json(allCasas);
     } catch (error: any) {
         return res.status(500).json({ message: error.message });
@@ -58,13 +57,13 @@ export const getAllCasas = async (_req: Request, res: Response, option: optionsI
 export const getCasaById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const findCasa = await Casas.findById(id);
+        const casa = await Casa.findByPk(id);
 
-        if (!findCasa) {
-            return res.status(404).json({ message: `No se encontro la casa con ID: ${id}` });
-        };
+        if (!casa) {
+            return res.status(404).json({ message: `No se encontró ninguna casa con el id '${id}'` })
+        }
 
-        return res.status(200).json(findCasa);
+        return res.status(200).json(casa);
     } catch (error: any) {
         return res.status(500).json({ message: error.message });
     }
@@ -73,21 +72,19 @@ export const getCasaById = async (req: Request, res: Response) => {
 export const deleteCasa = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
+        const casa = await Casa.findByPk(id);
 
-        const findCasa = await Casas.findById(id);
+        if (!casa) {
+            return res.status(404).json({ message: `No se encontró ninguna casa con el id '${id}'` })
+        }
 
-        if (!findCasa) {
-            return res.status(404).json({ message: `No se encontro la casa con ID: ${id} para eliminar` })
-        };
+        const allImages = [ ...casa.blueprints, ...casa.inside, ...casa.offside ];
+        for (const image of allImages) {
+            await deleteCloud(image);
+        }
 
-        const allImages = [...findCasa.blueprints, ...findCasa.inside, ... findCasa.offside];
-
-        allImages.forEach(async (image) => {
-            await deleteCloud(image)
-        });
-
-        await Casas.findByIdAndDelete(id);
-        return res.status(200).json({ message: `La casa '${findCasa.nameModel}' fue eliminada con exito` });
+        await Casa.destroy({ where: { id } });
+        return res.status(200).json({ message: `La casa con el id '${id}' ha sido eliminada exitosamente` });
     } catch (error: any) {
         return res.status(500).json({ message: error.message });
     }
@@ -95,17 +92,15 @@ export const deleteCasa = async (req: Request, res: Response) => {
 
 export const updateCasa = async (req: Request, res: Response) => {
     try {
-        const upGradeData = req.body;  // En esta constante me guardo los datos para actualizar una casa.
         const { id } = req.params;
+        const casa = await Casa.findByPk(id);
 
-        const findCasa = await Casas.findById(id);
-
-        if (!findCasa) {
-            return res.status(404).json({ message: `No se encontro la casa con ID: ${id} para actualizar` })
+        if (!casa) {
+            return res.status(404).json({ message: `No se encontró ninguna casa con el id '${id}'` })
         }
 
-        await Casas.findByIdAndUpdate(id, upGradeData, { new: true });
-        return res.status(200).json({ message: `La casa ${findCasa.nameModel} fue actualizada con exito` });
+        await Casa.update(req.body, { where: { id } });
+        return res.status(200).json({ message: `La casa con el id '${id}' ha sido actualizada exitosamente` });
     } catch (error: any) {
         return res.status(500).json({ message: error.message });
     }
