@@ -2,15 +2,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { v2 } from 'cloudinary';
 
-function getPublicIdFromUrl(imageUrl: string) {
-
-    const startIndex = imageUrl.lastIndexOf('/') + 1; 
-    const endIndex = imageUrl.lastIndexOf('.'); 
-
-   
-    const publicId = imageUrl.substring(startIndex, endIndex);
-
-    return publicId;
+function getPublicIdFromUrl(imageUrl: string): string {
+    const fileName = imageUrl.split('/').pop() || '';
+    return fileName.split('.')[0];
 };
 
 
@@ -24,12 +18,14 @@ export function deleteServerImg(directory: string) {
             fs.unlinkSync(rutaArchivo);
         });
     }
-    else { return "La Carpeta es incorrecta" };
+    else { console.warn("La carpeta no existe:", directory) };
 };
 
-export async function deleteCloud(url: string){
-    
-    const publicId = getPublicIdFromUrl(url);
-
-    await v2.uploader.destroy(publicId);
-}
+export async function deleteCloud(url: string) {
+    try {
+        const publicId = getPublicIdFromUrl(url);
+        await v2.uploader.destroy(publicId);
+    } catch (error) {
+        console.error('Error al eliminar la imagen de Cloudinary:', error);
+    }
+};
