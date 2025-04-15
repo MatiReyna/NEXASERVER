@@ -1,7 +1,10 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../db';
+import { CasaAttributes } from '../types/casas.type';
 
-export const Casa = sequelize.define('Casa',
+interface CasaInstance extends Model<CasaAttributes>, CasaAttributes {}
+
+export const Casa = sequelize.define<CasaInstance>('Casa',
     {
         id: {
             type: DataTypes.UUID,

@@ -1,7 +1,10 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../db';
+import { UserAttributes } from '../types/user.type';
 
-export const User = sequelize.define('User',
+interface UserInstance extends Model<UserAttributes>, UserAttributes {}
+
+export const User = sequelize.define<UserInstance>('User',
     {
         id: {
             type: DataTypes.UUID,

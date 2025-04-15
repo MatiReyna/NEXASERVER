@@ -6,7 +6,7 @@ export interface CasaAttributes {
     rooms: number;
     bathrooms: number;
     dimensions: number;
-    blueprint: string[];
+    blueprints: string[];
     inside: string[];
-    outside: string[];
+    offside: string[];
 };
