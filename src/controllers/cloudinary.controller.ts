@@ -13,36 +13,32 @@ const API_SECRET = process.env.API_SECRET;
 const { config, uploader } = v2;
 
 config({
-    cloud_name: CLOUD_NAME,
-    api_key: API_KEY,
-    api_secret: API_SECRET
+  cloud_name: CLOUD_NAME,
+  api_key: API_KEY,
+  api_secret: API_SECRET
 });
 
 export const uploadImage = async (req: Request, res: Response) => {
-    try {
+  try {
+    const result = await uploader.upload(req.file.path);
+    res.status(200).json({ imageUrl: result.secure_url });
 
-        const result = await uploader.upload(req.file.path);
-        res.status(200).json({ imageUrl: result.secure_url });
+    const directory = path.join('uploads');
+    deleteServerImg(directory);
 
-
-        const directory = path.join('uploads');
-        deleteServerImg(directory);
-
-    } catch (error) {
-        console.error('Error al subir la imagen:', error);
-        res.status(500).json({ error: 'Error al subir la imagen a Cloudinary' });
-    }
+  } catch (error) {
+    console.error('Error al subir la imagen:', error);
+    res.status(500).json({ error: 'Error al subir la imagen a Cloudinary' });
+  }
 };
 
 export const deleteImage = async (req: Request, res: Response) => {
-    const { imageUrl } = req.body;
-    try {
-
-      await deleteCloud(imageUrl);
-  
-      res.status(200).json({ message: 'Imagen eliminada exitosamente de Cloudinary' });
-    } catch (error) {
-      console.error('Error al eliminar la imagen de Cloudinary:', error);
-      res.status(500).json({ error: 'Error al eliminar la imagen de Cloudinary' });
-    }
-  };
+  const { imageUrl } = req.body;
+  try {
+    await deleteCloud(imageUrl);
+    res.status(200).json({ message: 'Imagen eliminada exitosamente de Cloudinary' });
+  } catch (error) {
+    console.error('Error al eliminar la imagen de Cloudinary:', error);
+    res.status(500).json({ error: 'Error al eliminar la imagen de Cloudinary' });
+  }
+};

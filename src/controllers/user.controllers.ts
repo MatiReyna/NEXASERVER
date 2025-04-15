@@ -1,45 +1,44 @@
-import User from "../models/user.models";
-import userInterface from "../types/user.type";
+import { Request, Response } from 'express';
+import { User } from '../models/user.models';
 import bcrypt from 'bcryptjs';
-import { Request, Response } from "express";
 
 export const createUser = async (req: Request, res: Response) => {
     try {
-        const userCount = await User.countDocuments();
-        if (userCount >= 1) {
-            return res.status(400).json('Ya existe un administrador');
-        };
-        const { email, password }: userInterface = req.body;
+        const userCount = await User.count();
 
+        if (userCount >= 1) {
+            return res.status(400).json({ message: 'El servidor ya tiene un administrador registrado' });
+        }
+
+        const { email, password } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const nuevoUsuario = new User({
+        const nuevoUsuario = await User.create({
             email,
             password: hashedPassword
-        }).save();
-        return res.status(200).json(nuevoUsuario);
+        });
+        return res.status(201).json(nuevoUsuario);
     } catch (error: any) {
-        return res.status(500).json(error.message);
+        return res.status(500).json({ message: error.message });
     }
 };
 
-export const logIn = async (req: Request, res: Response) => {
+export const logIn = async (req:Request, res: Response) => {
     try {
-        const { email, password }: userInterface = req.body;
+        const { email, password } = req.body;
+        const admin = await User.findOne({ where: { email } });
 
-        const admin = await User.findOne({ email });
-        if(!admin){
-            return res.json({validate: false, email:'Email incrrecto' });
-        };
+        if (!admin) {
+            return res.json({ validate: false, email: 'Email incorrecto' })
+        }
 
-        const validatePassword = await bcrypt.compare(password, admin.password );
-        if(!validatePassword){
-            return res.json({validate: false, password:'Contraseña incorrecta' });
-        };
+        const validatePassword = await bcrypt.compare(password, admin.password);
 
-        return res.status(200).json({validate: true, message:'Bienvenido' });
+        if (!validatePassword) {
+            return res.json({ validate: false, password: 'Contraseña incorrecta' })
+        }
+        return res.json({ validate: true, message: 'Bienvenido' });
     } catch (error: any) {
-        return res.status(500).json(error.message);
+        return res.status(500).json({ message: error.message });
     }
 };
-
