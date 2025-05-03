@@ -17,8 +17,11 @@ server.use(morgan('dev'));
 server.use("/", routes);
 
 server.use((err: Error, _req:Request, res:Response, _next:NextFunction) => {
-    console.error(err.stack);
-    return res.status(500).send('Algo salió mal!');
+    console.error('❌ Error stack:', err.stack);
+    return res.status(500).json({
+        message: 'Something went wrong',
+        error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
 });
 
 export default server;
