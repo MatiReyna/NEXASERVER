@@ -7,6 +7,6 @@ const router = Router();
 const upload = multer({ dest: 'uploads/' });
 
 router.post('/upload', upload.single('image'), uploadImage);
-router.delete('/remove',deleteImage);
+router.delete('/remove', deleteImage);
 
 export default router;
