@@ -9,4 +9,4 @@ export interface CasaAttributes {
     blueprints: string[];
     inside: string[];
     offside: string[];
-};
+}

@@ -14,7 +14,7 @@ server.use(cors());
 
 server.use(morgan('dev'));
 
-server.use("/", routes);
+server.use('/', routes);
 
 server.use((err: Error, _req:Request, res:Response, _next:NextFunction) => {
     console.error('❌ Error stack:', err.stack);
