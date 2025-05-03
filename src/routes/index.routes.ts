@@ -6,7 +6,7 @@ import cloudinaryRoutes from './cloudinary.routes'
 const router = Router();
 
 router.use('/casas', casasRoutes);
-router.use('/users', userRoutes);
-router.use('/images', cloudinaryRoutes);
+router.use('/auth', userRoutes);
+router.use('/media', cloudinaryRoutes);
 
 export default router;
