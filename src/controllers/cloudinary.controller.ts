@@ -1,22 +1,18 @@
-import { v2 } from 'cloudinary';
 import { Request, Response } from 'express';
 import { deleteCloud, deleteServerImg } from '../helpers/imageAuxFunc';
 
 import dotenv from 'dotenv';
 import * as path from 'path';
 
+import cloudinary from '../config/cloudinary';
+const { uploader } = cloudinary;
+
 dotenv.config();
 
-const CLOUD_NAME = process.env.CLOUD_NAME;
-const API_KEY = process.env.API_KEY;
-const API_SECRET = process.env.API_SECRET;
-const { config, uploader } = v2;
-
-config({
-  cloud_name: CLOUD_NAME,
-  api_key: API_KEY,
-  api_secret: API_SECRET
-});
+if (!process.env.CLOUD_NAME || !process.env.API_KEY || !process.env.API_SECRET) {
+  console.error('Faltan variables de entorno de Cloudinary');
+  process.exit(1);
+}
 
 export const uploadImage = async (req: Request, res: Response) => {
   try {
@@ -25,7 +21,7 @@ export const uploadImage = async (req: Request, res: Response) => {
     }
 
     const result = await uploader.upload(req.file.path);
-    res.status(200).json({ imageUrl: result.secure_url });
+    res.status(200).json({ imageUrl: result.secure_url, public_id: result.public_id });
 
     const directory = path.join('uploads');
     deleteServerImg(directory);
@@ -38,6 +34,11 @@ export const uploadImage = async (req: Request, res: Response) => {
 
 export const deleteImage = async (req: Request, res: Response) => {
   const { imageUrl } = req.body;
+
+  if (!imageUrl) {
+    return res.status(400).json({ error: 'Falta la URL de la imagen a eliminar' });
+  }
+
   try {
     await deleteCloud(imageUrl);
     res.status(200).json({ message: 'Imagen eliminada exitosamente de Cloudinary' });

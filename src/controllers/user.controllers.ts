@@ -17,7 +17,8 @@ export const createUser = async (req: Request, res: Response) => {
             email,
             password: hashedPassword
         });
-        return res.status(201).json(nuevoUsuario);
+        const { id, email: createdEmail } = nuevoUsuario
+        return res.status(201).json({ id, email: createdEmail });
     } catch (error: any) {
         return res.status(500).json({ message: error.message });
     }
@@ -29,13 +30,13 @@ export const logIn = async (req:Request, res: Response) => {
         const admin = await User.findOne({ where: { email } });
 
         if (!admin) {
-            return res.json({ validate: false, email: 'Email incorrecto' })
+            return res.json({ validate: false, message: 'Credenciales incorrectas' })
         }
 
         const validatePassword = await bcrypt.compare(password, admin.password);
 
         if (!validatePassword) {
-            return res.json({ validate: false, password: 'Contraseña incorrecta' })
+            return res.json({ validate: false, message: 'Credenciales incorrectas' })
         }
         return res.json({ validate: true, message: 'Bienvenido' });
     } catch (error: any) {

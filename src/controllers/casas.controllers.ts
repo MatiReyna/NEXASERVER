@@ -7,6 +7,10 @@ export const createCasa = async (req: Request, res: Response) => {
     try {
         const { nameModel } = req.body;
 
+        if (!nameModel || typeof nameModel !== 'string') {
+            return res.status(400).json({ message: 'El campo nameModel es obligatorio y debe ser un string.' });
+        }
+
         const findCasa = await Casa.findOne({ where: { nameModel } });
 
         if (findCasa) {
@@ -93,13 +97,11 @@ export const deleteCasa = async (req: Request, res: Response) => {
 export const updateCasa = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const casa = await Casa.findByPk(id);
 
-        if (!casa) {
-            return res.status(404).json({ message: `No se encontró ninguna casa con el id '${id}'` })
+        const [ updated ] = await Casa.update(req.body, { where: { id } });
+        if (!updated) {
+            return res.status(404).json({ message: `No se encontró ninguna casa con el id '${id}'` });
         }
-
-        await Casa.update(req.body, { where: { id } });
         return res.status(200).json({ message: `La casa con el id '${id}' ha sido actualizada exitosamente` });
     } catch (error: any) {
         return res.status(500).json({ message: error.message });
