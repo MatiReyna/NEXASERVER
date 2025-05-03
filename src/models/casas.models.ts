@@ -13,7 +13,8 @@ export const Casa = sequelize.define<CasaInstance>('Casa',
         },
         nameModel: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            validate: { len: [3, 50] }
         },
         description: {
             type: DataTypes.TEXT,
@@ -21,7 +22,8 @@ export const Casa = sequelize.define<CasaInstance>('Casa',
         },
         price: {
             type: DataTypes.DECIMAL,
-            allowNull: false
+            allowNull: false,
+            validate: { min: 0 }
         },
         rooms: {
             type: DataTypes.INTEGER,
@@ -32,7 +34,7 @@ export const Casa = sequelize.define<CasaInstance>('Casa',
             defaultValue: 1
         },
         dimensions: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.FLOAT,
             allowNull: false
         },
         blueprints: {
@@ -47,4 +49,4 @@ export const Casa = sequelize.define<CasaInstance>('Casa',
             type: DataTypes.ARRAY(DataTypes.STRING),
             allowNull: false
         }
-    }, { tableName: 'casas', timestamps: false });
+    }, { tableName: 'casas', timestamps: true });
