@@ -4,11 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --exec ts-node ./server.ts"
+    "start": "nodemon --exec ts-node ./server.ts",
+    "build": "tsc",
+    "prod": "npm run build && node dist/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["node", "express", "typescript", "sequelize", "backend"],
+  "author": "Matías Reyna",
   "license": "ISC",
   "devDependencies": {
     "@types/cors": "^2.8.17",
