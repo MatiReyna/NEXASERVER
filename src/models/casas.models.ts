@@ -11,23 +11,56 @@ export const Casa = sequelize.define<CasaInstance>('Casa',
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true
         },
+        slug: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true,
+        },
         nameModel: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: { len: [3, 50] }
         },
+        mainImage: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
         description: {
             type: DataTypes.TEXT,
             allowNull: false
         },
+        category: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        tag: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         price: {
-            type: DataTypes.DECIMAL,
+            type: DataTypes.DECIMAL(10, 2),  // 10 digits, 2 decimals.
             allowNull: false,
             validate: { min: 0 }
         },
+        status: {
+            type: DataTypes.ENUM('disponible', 'en desarrollo', 'prototipo'),
+            allowNull: false,
+            defaultValue: 'disponible'
+        },
+        visible: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: true
+        },
+        buildTime: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
         rooms: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            defaultValue: 1,
+            validate: { min: 1 }
         },
         bathrooms: {
             type: DataTypes.INTEGER,
@@ -45,8 +78,12 @@ export const Casa = sequelize.define<CasaInstance>('Casa',
             type: DataTypes.ARRAY(DataTypes.STRING),
             allowNull: false
         },
-        offside: {
+        outside: {
             type: DataTypes.ARRAY(DataTypes.STRING),
             allowNull: false
+        },
+        internalNotes: {
+            type: DataTypes.TEXT,
+            allowNull: true
         }
     }, { tableName: 'casas', timestamps: true });
