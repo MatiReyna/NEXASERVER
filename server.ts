@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+import './src/models';  // 👇 Importa modelos y asociaciones.
+
 const PORT = process.env.PORT || 3001;
 
 async function startServer() {
