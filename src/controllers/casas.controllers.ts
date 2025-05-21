@@ -5,6 +5,13 @@ import { deleteCloud } from '../helpers/imageAuxFunc';
 
 export const createCasa = async (req: Request, res: Response) => {
     try {
+        const requiredFields = [ 'nameModel', 'price', 'dimendions', 'mainImage', 'category' ];
+        for (const field of requiredFields) {
+            if (!req.body[ field ]) {
+                return res.status(400).json({ message: `El campo ${field} es obligatorio` });
+            }
+        }
+
         const { nameModel } = req.body;
 
         if (!nameModel || typeof nameModel !== 'string') {
@@ -29,7 +36,7 @@ export const getCasaByName = async (req: Request, res: Response) => {
         const { name } = req.query;
 
         if (!name || typeof name !== 'string' || name.trim() === '') {
-            return getAllCasas(req, res);
+            return res.status(400).json({ message: 'Debes proporcionar un nombre para buscar' });
         }
 
         const casas = await Casa.findAll({
@@ -82,7 +89,7 @@ export const deleteCasa = async (req: Request, res: Response) => {
             return res.status(404).json({ message: `No se encontró ninguna casa con el id '${id}'` })
         }
 
-        const allImages = [ ...casa.blueprints, ...casa.inside, ...casa.offside ];
+        const allImages = [ ...casa.blueprints, ...casa.inside, ...casa.outside ];
         for (const image of allImages) {
             await deleteCloud(image);
         }
@@ -102,7 +109,9 @@ export const updateCasa = async (req: Request, res: Response) => {
         if (!updated) {
             return res.status(404).json({ message: `No se encontró ninguna casa con el id '${id}'` });
         }
-        return res.status(200).json({ message: `La casa con el id '${id}' ha sido actualizada exitosamente` });
+
+        const updateCasa = await Casa.findByPk(id);
+        return res.status(200).json({ message: `La casa con el id '${id}' ha sido actualizada exitosamente`, data: updateCasa });
     } catch (error: any) {
         return res.status(500).json({ message: error.message });
     }
