@@ -27,18 +27,26 @@ export const createUser = async (req: Request, res: Response) => {
 export const logIn = async (req:Request, res: Response) => {
     try {
         const { email, password } = req.body;
-        const admin = await User.findOne({ where: { email } });
+        const user = await User.findOne({ where: { email } });
 
-        if (!admin) {
+        if (!user) {
             return res.json({ validate: false, message: 'Credenciales incorrectas' })
         }
 
-        const validatePassword = await bcrypt.compare(password, admin.password);
+        const validatePassword = await bcrypt.compare(password, user.password);
 
         if (!validatePassword) {
             return res.json({ validate: false, message: 'Credenciales incorrectas' })
         }
-        return res.json({ validate: true, message: 'Bienvenido' });
+        return res.json({
+            validate: true,
+            message: 'Bienvenido',
+            user: {
+                id: user.id,
+                email: user.email,
+                role: user.role
+            }
+        });
     } catch (error: any) {
         return res.status(500).json({ message: error.message });
     }
