@@ -15,7 +15,8 @@ export const createUser = async (req: Request, res: Response) => {
 
         const nuevoUsuario = await User.create({
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            role: 'admin'
         });
         const { id, email: createdEmail } = nuevoUsuario
         return res.status(201).json({ id, email: createdEmail });
