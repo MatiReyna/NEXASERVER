@@ -1,5 +1,5 @@
 export interface BrandAttributes {
-    id: string;
+    id?: string;
     name: string;
     logoUrl: string;
     activo: boolean;
